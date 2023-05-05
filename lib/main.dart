@@ -9,28 +9,74 @@ class MeuApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // O MaterialApp é um widget que envolve vários outros widgets - Necessário no Material Design
     return MaterialApp(
-      // Widget que define caraccterísticas típicas de um app. AppBar, actions, menus...
-      home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Primeiro Apliccatiovo - IGTI'),
-          ),
-          body: Column(
-            children: <Widget>[
-              const Text(
-                'Olá Mundo!!! \nDesenvolvedor Mobile \nIGTI',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 32),
-              ),
-              const SizedBox(height: 30),
-              TextButton(
-                style: TextButton.styleFrom(
-                  textStyle: const TextStyle(fontSize: 20),
-                ),
-                onPressed: () {},
-                child: const Text('Test'),
-              ),
-            ],
-          )),
+      home: MeuAppStateful(),
     );
+  }
+}
+
+class MeuAppStateful extends StatefulWidget {
+  MeuAppStateful() : super();
+
+  @override
+  MyStatefulAppState createState() => MyStatefulAppState();
+}
+
+class MyStatefulAppState extends State<MeuAppStateful> {
+  static const texto = ["I", "IG", "IGT", "IGTI"];
+  int contador = 0;
+
+  void mudarValor() {
+    setState(() {
+      if (contador == 3) {
+        contador = 0;
+      } else {
+        contador++;
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    print("initState");
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print("didChangeDependencies");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print("build");
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Primeiro App - IGTI"),
+      ),
+      body: Column(children: <Widget>[
+        Text(
+          texto[contador],
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 32,
+          ),
+        ),
+        const SizedBox(
+          height: 30,
+        ),
+        TextButton(
+            style:
+                TextButton.styleFrom(textStyle: const TextStyle(fontSize: 32)),
+            onPressed: mudarValor,
+            child: const Text('Alterar'))
+      ]),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    print("dispose");
   }
 }
