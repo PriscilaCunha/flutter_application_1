@@ -1,82 +1,65 @@
-// Importa pacote do Flutter para Material Design
+// https://pub.dev/packages/camera
+//
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MeuApp());
+late List<CameraDescription> _cameras;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  _cameras = await availableCameras();
+  runApp(const CameraApp());
 }
 
-class MeuApp extends StatelessWidget {
-  Widget build(BuildContext context) {
-    // O MaterialApp é um widget que envolve vários outros widgets - Necessário no Material Design
-    return MaterialApp(
-      home: MeuAppStateful(),
-    );
-  }
-}
-
-class MeuAppStateful extends StatefulWidget {
-  MeuAppStateful() : super();
+/// CameraApp is the Main Application.
+class CameraApp extends StatefulWidget {
+  /// Default Constructor
+  const CameraApp({super.key});
 
   @override
-  MyStatefulAppState createState() => MyStatefulAppState();
+  State<CameraApp> createState() => _CameraAppState();
 }
 
-class MyStatefulAppState extends State<MeuAppStateful> {
-  static const texto = ["I", "IG", "IGT", "IGTI"];
-  int contador = 0;
+class _CameraAppState extends State<CameraApp> {
+  late CameraController controller;
 
-  void mudarValor() {
-    setState(() {
-      if (contador == 3) {
-        contador = 0;
-      } else {
-        contador++;
+  @override
+  void initState() {
+    super.initState();
+    controller = CameraController(_cameras[0], ResolutionPreset.max);
+    controller.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    }).catchError((Object e) {
+      if (e is CameraException) {
+        switch (e.code) {
+          case 'CameraAccessDenied':
+            // Handle access errors here.
+            break;
+          default:
+            // Handle other errors here.
+            break;
+        }
       }
     });
   }
 
   @override
-  void initState() {
-    super.initState();
-    print("initState");
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print("didChangeDependencies");
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    print("build");
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Primeiro App - IGTI"),
-      ),
-      body: Column(children: <Widget>[
-        Text(
-          texto[contador],
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 32,
-          ),
-        ),
-        const SizedBox(
-          height: 30,
-        ),
-        TextButton(
-            style:
-                TextButton.styleFrom(textStyle: const TextStyle(fontSize: 32)),
-            onPressed: mudarValor,
-            child: const Text('Alterar'))
-      ]),
+    if (!controller.value.isInitialized) {
+      return Container();
+    }
+    return MaterialApp(
+      home: CameraPreview(controller),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    print("dispose");
   }
 }
